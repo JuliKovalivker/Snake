@@ -142,6 +142,10 @@ PrefabInstance:
       propertyPath: snake2
       value: 
       objectReference: {fileID: 8212246259862984898, guid: d45878cfa64f4fc45b1b83cba6369ee6, type: 3}
+    - target: {fileID: 3532943670288921715, guid: bc6ed2fc33a23574e97c8487a7807b49, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4223767873773117139, guid: bc6ed2fc33a23574e97c8487a7807b49, type: 3}
       propertyPath: m_Name
       value: Apple
@@ -552,6 +556,14 @@ PrefabInstance:
       objectReference: {fileID: 1407744019}
     - target: {fileID: -1312953155384074708, guid: e177fbee08830bd4793ee114da9a450b, type: 3}
       propertyPath: snake2
+      value: 
+      objectReference: {fileID: 8212246259862984898, guid: d45878cfa64f4fc45b1b83cba6369ee6, type: 3}
+    - target: {fileID: 880206446506662863, guid: e177fbee08830bd4793ee114da9a450b, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1531145341223211587, guid: e177fbee08830bd4793ee114da9a450b, type: 3}
+      propertyPath: segmentPrefab
       value: 
       objectReference: {fileID: 8212246259862984898, guid: d45878cfa64f4fc45b1b83cba6369ee6, type: 3}
     - target: {fileID: 8212246259862984898, guid: e177fbee08830bd4793ee114da9a450b, type: 3}
