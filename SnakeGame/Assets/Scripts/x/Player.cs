@@ -1,90 +1,65 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
     public GameObject snakeHead;
-    private List<GameObject> segments;
+    private List<GameObject> segments = new List<GameObject>();
     public GameObject segmentPrefab;
 
-    bool right;
-    bool up;
-    bool pressedRight;
-    bool pressedUp;
+    public float gridSize = 0.5f; // Grid size for discrete movement
+    private Vector2 direction = Vector2.right; // Initial movement direction
+    private Vector2 inputDirection = Vector2.right;
+    public float moveInterval = 0.2f;
+    private float moveTimer;
 
-    // Start is called before the first frame update
     void Start()
     {
-        segments = new List<GameObject>();
         segments.Add(snakeHead);
+        moveTimer = moveInterval;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        right = false;
-        up = false;
-        pressedRight = false;
-        pressedUp = false;
+        // Capture input but only change direction if it's not a reverse
+        if (Input.GetKeyDown(KeyCode.RightArrow) && direction != Vector2.left)
+            inputDirection = Vector2.right;
+        if (Input.GetKeyDown(KeyCode.LeftArrow) && direction != Vector2.right)
+            inputDirection = Vector2.left;
+        if (Input.GetKeyDown(KeyCode.UpArrow) && direction != Vector2.down)
+            inputDirection = Vector2.up;
+        if (Input.GetKeyDown(KeyCode.DownArrow) && direction != Vector2.up)
+            inputDirection = Vector2.down;
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        // Move the snake at regular intervals
+        moveTimer -= Time.deltaTime;
+        if (moveTimer <= 0)
         {
-            snakeHead.transform.position += new Vector3(0.01f, 0f, 0f);
-            right = true;
-            pressedRight = true;
+            moveTimer = moveInterval;
+            MoveSnake();
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            snakeHead.transform.position -= new Vector3(0.01f, 0f, 0f);
-            right = false;
-            pressedRight = true;
-        }
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            snakeHead.transform.position+= new Vector3(0f, 0.01f, 0f);
-            up = true;
-            pressedUp = true;
-        }
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            snakeHead.transform.position -= new Vector3(0f, 0.01f, 0f);
-            up = false;
-            pressedUp = true;
-        }
+    }
 
-        float x = 0.0f;
-        float y = 0.0f;
-        if (right && pressedRight)
+    void MoveSnake()
+    {
+        // Update the direction for the next move
+        direction = inputDirection;
+
+        // Move the body segments to follow the head
+        for (int i = segments.Count - 1; i > 0; i--)
         {
-            x = -0.5f;
-        }
-        else if (right == false && pressedRight)
-        {
-            x = 0.5f;
-        }
-        if (up && pressedUp)
-        {
-            y = -0.5f;
-        }
-        else if (up == false && pressedUp)
-        {
-            y = 0.5f;
+            segments[i].transform.position = segments[i - 1].transform.position;
         }
 
-        if (pressedUp || pressedRight)
-        {
-            for (int i = 1; i < segments.Count; i++)
-            { 
-                segments[i].transform.position = segments[i - 1].transform.position + new Vector3(x, y, 0f);
-            }
-        }
-
+        // Move the head in the current direction
+        Vector3 newPosition = snakeHead.transform.position + new Vector3(direction.x, direction.y, 0f) * gridSize;
+        snakeHead.transform.position = newPosition;
     }
 
     void OnCollisionEnter(Collision col)
     {
-        GameObject segment = Instantiate(this.segmentPrefab);
+        // Grow snake by adding a new segment at the last segment's position
+        GameObject segment = Instantiate(segmentPrefab);
         segment.transform.position = segments[segments.Count - 1].transform.position;
         segments.Add(segment);
     }
