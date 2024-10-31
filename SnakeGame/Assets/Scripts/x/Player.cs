@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -7,10 +9,10 @@ public class Player : MonoBehaviour
     private List<GameObject> segments = new List<GameObject>();
     public GameObject segmentPrefab;
 
-    public float gridSize = 0.5f; // Grid size for discrete movement
-    private Vector2 direction = Vector2.right; // Initial movement direction
-    private Vector2 inputDirection = Vector2.right;
-    public float moveInterval = 0.2f;
+    private float gridSize = 0.5f;
+    private Vector3 inputDirection = Vector3.right;
+    private Vector3 direction = Vector3.right;
+    private float moveInterval = 0.2f;
     private float moveTimer;
 
     void Start()
@@ -21,17 +23,15 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        // Capture input but only change direction if it's not a reverse
-        if (Input.GetKeyDown(KeyCode.RightArrow) && direction != Vector2.left)
-            inputDirection = Vector2.right;
-        if (Input.GetKeyDown(KeyCode.LeftArrow) && direction != Vector2.right)
-            inputDirection = Vector2.left;
-        if (Input.GetKeyDown(KeyCode.UpArrow) && direction != Vector2.down)
-            inputDirection = Vector2.up;
-        if (Input.GetKeyDown(KeyCode.DownArrow) && direction != Vector2.up)
-            inputDirection = Vector2.down;
+        if (Input.GetKeyDown(KeyCode.RightArrow) && direction != Vector3.left)
+            inputDirection = Vector3.right;
+        if (Input.GetKeyDown(KeyCode.LeftArrow) && direction != Vector3.right)
+            inputDirection = Vector3.left;
+        if (Input.GetKeyDown(KeyCode.UpArrow) && direction != Vector3.down)
+            inputDirection = Vector3.up;
+        if (Input.GetKeyDown(KeyCode.DownArrow) && direction != Vector3.up)
+            inputDirection = Vector3.down;
 
-        // Move the snake at regular intervals
         moveTimer -= Time.deltaTime;
         if (moveTimer <= 0)
         {
@@ -42,23 +42,29 @@ public class Player : MonoBehaviour
 
     void MoveSnake()
     {
-        // Update the direction for the next move
         direction = inputDirection;
 
-        // Move the body segments to follow the head
+        Vector3 headPosition = snakeHead.transform.position + new Vector3(direction.x, direction.y, 0f) * gridSize;
+
+        for (int i = 1; i < segments.Count; i++)
+        {
+            if (Vector3.Distance(headPosition, segments[i].transform.position) < 0.1f)
+            {
+                SceneManager.LoadScene("GameOverScene");
+                //return;
+            }
+        }
+
         for (int i = segments.Count - 1; i > 0; i--)
         {
             segments[i].transform.position = segments[i - 1].transform.position;
         }
 
-        // Move the head in the current direction
-        Vector3 newPosition = snakeHead.transform.position + new Vector3(direction.x, direction.y, 0f) * gridSize;
-        snakeHead.transform.position = newPosition;
+        snakeHead.transform.position = headPosition;
     }
 
     void OnCollisionEnter(Collision col)
     {
-        // Grow snake by adding a new segment at the last segment's position
         GameObject segment = Instantiate(segmentPrefab);
         segment.transform.position = segments[segments.Count - 1].transform.position;
         segments.Add(segment);
